@@ -15,6 +15,13 @@ main {
   flex: 1;
 }
 
+.btn-primary,
+.btn-outline-primary {
+  background-color: #ffa024;
+  color: #000;
+  border: #000;
+}
+
 .products {
   display: flex;
   flex-wrap: wrap;
@@ -25,11 +32,6 @@ main {
   color: #ffa024;
 }
 
-.btn-primary,
-.btn-outline-primary {
-  background-color: #ffa024;
-  color: #000;
-}
 .product {
   border: 1px #404040 solid;
   margin: 1rem;
@@ -45,11 +47,13 @@ main {
 }
 
 .img-large {
-  max-width: 75%;
+  max-width: 100%;
 }
+
 .img-thumbnail {
   height: 80px;
 }
+
 .small-container {
   max-width: 600px;
 }
@@ -64,7 +68,8 @@ main {
   color: #f08000;
 }
 
-/*sidebar*/
+/* sidebar */
+
 .navbar-brand {
   font-weight: bold;
 }
@@ -77,6 +82,7 @@ main {
   background-color: #100901;
   transition: 0.5s;
 }
+
 .site-container {
   transition: 0.4s;
 }
