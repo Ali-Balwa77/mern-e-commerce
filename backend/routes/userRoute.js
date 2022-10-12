@@ -8,10 +8,13 @@ const userRouter = express.Router();
 
 userRouter.post(
   "/signin",
-  expressAsyncHandler(async (req, res) => {
+  expressAsyncHandler(async (req, res) =>
+  {
     const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      if (bcrypt.compareSync(req.body.password, user.password)) {
+    if (user)
+    {
+      if (bcrypt.compareSync(req.body.password, user.password))
+      {
         res.send({
           _id: user._id,
           name: user.name,
@@ -28,7 +31,8 @@ userRouter.post(
 
 userRouter.post(
   "/signup",
-  expressAsyncHandler(async (req, res) => {
+  expressAsyncHandler(async (req, res) =>
+  {
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
@@ -48,12 +52,15 @@ userRouter.post(
 userRouter.put(
   "/profile",
   isAuth,
-  expressAsyncHandler(async (req, res) => {
+  expressAsyncHandler(async (req, res) =>
+  {
     const user = await User.findById(req.user._id);
-    if (user) {
+    if (user)
+    {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
-      if (req.body.password) {
+      if (req.body.password)
+      {
         user.password = bcrypt.hashSync(req.body.password, 8);
       }
       const updateUser = await user.save();
@@ -64,8 +71,9 @@ userRouter.put(
         isAdmin: updateUser.isAdmin,
         token: genrateToken(updateUser)
       })
-    }else{
-      res.status(404).send({message: "User not found"})
+    } else
+    {
+      res.status(404).send({ message: "User not found" })
     }
   })
 );
