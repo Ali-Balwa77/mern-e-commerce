@@ -29,6 +29,8 @@ import SearchScreen from "./screens/SearchScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardScreen from "./screens/DashboardScreen";
 import AdminRoute from "./components/AdminRoute";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -56,6 +58,8 @@ function App() {
     };
     fetchCategories();
   }, []);
+
+const stripePromise = loadStripe('pk_test_51LfzftSHZz9FUFEidTXpyBYGDaeSD0kDxbJelvwJgQW65OulAifnQ1IsoMf4PjKjzRlmxaebb6F4AGdlwBIk2h3N00VQcSYm7B');
 
   return (
     <BrowserRouter>
@@ -175,12 +179,14 @@ function App() {
               />
               <Route path="/shipping" element={<ShippingAddressScreen />} />
               <Route path="/payment" element={<PaymentMethodScreen />} />
-              <Route path="/placeorder" element={<PlaceOrderScreen />} />
+              <Route path="/placeorder" element={<Elements stripe={stripePromise}><PlaceOrderScreen /></Elements>} />
               <Route
                 path="/order/:id"
                 element={
                   <ProtectedRoute>
-                    <OrderScreen />
+                    <Elements stripe={stripePromise}>
+                      <OrderScreen />
+                    </Elements>
                   </ProtectedRoute>
                 }
               />

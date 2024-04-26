@@ -57,10 +57,10 @@ orderRouter.put(
       order.isPaid = true;
       order.paidAt = Date.now();
       order.paymentResult = {
-        id: req.body.id,
-        status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.email_address,
+        id: req.body.paymentIntent.id,
+        status: req.body.paymentIntent.status,
+        update_time: order.paidAt,
+        email_address: req.body.paymentIntent.receipt_email,
       };
       const updateOrder = await order.save();
       res.send({ message: "Order Paid", order: updateOrder });

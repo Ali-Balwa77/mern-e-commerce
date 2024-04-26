@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useContext, useEffect,  useReducer } from "react";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Card from "react-bootstrap/esm/Card";
@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/esm/Button";
 import axios from "axios";
 import LoadingBox from "../components/LoadingBox"
+// import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 const reducer = (state, action) =>
 {
@@ -48,6 +49,26 @@ const PlaceOrderScreen = () =>
     cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
     cart.taxPrice = round2(0.15 * cart.itemsPrice);
     cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
+
+    // const [clientSecret, setClientSecret] = useState("");
+    // const stripe = useStripe();
+    // const elements = useElements();
+  
+    // STEP 2: make the payment after filling the form properly
+    // const makePayment = async () => {
+    //     try {
+    //        const payload = await stripe.confirmCardPayment(clientSecret, {
+    //         payment_method: {
+    //           card: elements.getElement(CardElement),
+    //         },
+    //         });
+    //         console.log(payload,'payload');
+            
+    //     } catch (error) {
+    //         dispatch({ type: "CREATE_FAIL" });
+    //         toast.error(getError(error));
+    //     }
+    // } 
 
     const placeOrderHandler = async () =>
     {
@@ -88,6 +109,19 @@ const PlaceOrderScreen = () =>
         {
             navigate("/payment");
         }
+
+        // fetch("http://localhost:5000/create-payment-intent", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ price: cart.totalPrice * 100 }),
+        // })
+        // .then(res => res.json())
+        // .then((data) => {
+        //   setClientSecret(data.clientSecret);  // <-- setting the client secret here
+        // });
+
     }, [cart, navigate]);
 
     return (
@@ -100,6 +134,7 @@ const PlaceOrderScreen = () =>
             <Row>
                 <Col md={ 8 }>
                     <Card className="mb-3">
+                        <Card.Body>
                         <Card.Title>Shipping</Card.Title>
                         <Card.Text>
                             <strong>Name:</strong> { cart.shippingAddress.fullName } <br />
@@ -108,6 +143,7 @@ const PlaceOrderScreen = () =>
                             { cart.shippingAddress.country }
                         </Card.Text>
                         <Link to="/shipping">Edit</Link>
+                        </Card.Body>
                     </Card>
                     <Card className="mb-3">
                         <Card.Body>
@@ -175,15 +211,33 @@ const PlaceOrderScreen = () =>
                                     </Row>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
-                                    <div>
-                                        <Button
-                                            type="button"
-                                            onClick={ placeOrderHandler }
-                                            disabled={ cart.cartItems.length === 0 }
-                                        >
-                                            Place Order
-                                        </Button>
-                                    </div>
+                                <div>
+                                            <Button
+                                                type="button"
+                                                onClick={ placeOrderHandler }
+                                                disabled={ cart.cartItems.length === 0 }
+                                            >
+                                                Place Order
+                                            </Button>
+                                        </div>
+                                    {/* { cart.paymentMethod === 'PayPal' ? (
+                                        <div>
+                                            <Button
+                                                type="button"
+                                                onClick={ placeOrderHandler }
+                                                disabled={ cart.cartItems.length === 0 }
+                                            >
+                                                Place Order
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <form onSubmit={makePayment}>
+                                            <CardElement />
+                                            <button type="submit" disabled={!stripe || loading}>
+                                                Pay
+                                            </button>
+                                        </form>
+                                    )} */}
                                     { loading && <LoadingBox></LoadingBox> }
                                 </ListGroup.Item>
                             </ListGroup>

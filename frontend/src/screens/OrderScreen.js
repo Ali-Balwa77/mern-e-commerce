@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useContext, useEffect, useState, useReducer } from "react";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Card from "react-bootstrap/esm/Card";
@@ -13,6 +13,7 @@ import { Store } from "../Store";
 import { toast } from "react-toastify";
 import { getError } from "../utils";
 import { Link } from "react-router-dom";
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -60,6 +61,10 @@ const OrderScreen = () => {
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
+  const [clientSecret, setClientSecret] = useState("");
+  const stripe = useStripe();
+  const elements = useElements();
+
   function createOrder(data, actions) {
     return actions.order
       .create({
@@ -98,6 +103,32 @@ const OrderScreen = () => {
     toast.error(getError(err));
   }
 
+  const makePayment = async (e) => {
+    e.preventDefault();
+      try {
+        dispatch({ type: "PAY_REQUEST" });
+        const stripePayload = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardElement),
+          },
+        });
+        if(stripePayload.paymentIntent.status === "succeeded"){
+          const { data } = await axios.put(
+            `/api/orders/${order._id}/pay`,
+            stripePayload,
+            {
+              headers: { authorization: `Bearer ${userInfo.token}` },
+            }
+          );
+          dispatch({ type: "PAY_SUCCESS", payload: data });
+          toast.success("Order is paid");
+        }
+      } catch (error) {
+        dispatch({ type: "PAY_FAIL", payload: getError(error) });
+        toast.error(getError(error));
+      }
+  }
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -133,7 +164,20 @@ const OrderScreen = () => {
         paypalDispatch({ type: "setLoadingStatus", value: "pending" });
       };
       loadPaypalScript();
-    }
+
+      const loadStripeScript = async () => {
+        axios.post("/create-payment-intent", {
+          price: order.totalPrice * 100,
+          headers: {
+              "Content-Type": "application/json",
+          },
+        })
+        .then(res => {
+          setClientSecret(res.data.clientSecret);  // <-- setting the client secret here
+        });
+      };
+      loadStripeScript();
+    };  
   }, [order, userInfo, orderId, navigate, paypalDispatch , successPay]);
 
   return loading ? (
@@ -153,7 +197,6 @@ const OrderScreen = () => {
               <Card.Title>Shipping</Card.Title>
               <Card.Text>
                 <strong>Name:</strong>
-                {console.log(order, "order")}
                 {order.shippingAddress.fullName} <br />
                 <strong>Address:</strong>
                 {order.shippingAddress.address},{order.shippingAddress.city},{" "}
@@ -246,8 +289,15 @@ const OrderScreen = () => {
                 </ListGroup.Item>
                 {!order.isPaid && (
                   <ListGroup.Item>
-                    {isPending ? (
+                    {order.paymentMethod === "Stripe" ? isPending ? (
                       <LoadingBox />
+                    ) : (
+                      <form onSubmit={makePayment}>
+                        <CardElement />
+                          <button type="submit" disabled={!stripe || loading}>
+                            Pay
+                          </button>
+                      </form> 
                     ) : (
                       <div>
                         <PayPalButtons
