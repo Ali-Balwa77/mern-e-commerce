@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { getError } from "../utils";
 import { Link } from "react-router-dom";
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import moment from 'moment';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -221,7 +222,7 @@ const OrderScreen = () => {
               </Card.Text>
               {order.isPaid ? (
                 <MessageBox variant="success">
-                  Paid at {order.paidAt}
+                  Paid at {moment(order.paidAt).format('DD/MM/YYYY H:mm')}
                 </MessageBox>
               ) : (
                 <MessageBox variant="danger">Not Paid</MessageBox>
