@@ -12,7 +12,7 @@ import stripe from "stripe";
 const stripeInstance = stripe("sk_test_51LfzftSHZz9FUFEiuaM6jrwyOVDEWfrLjoqEfhsMJbi3kU37Aw7x4nzGEeHqSqmjaq1RjgcztvxzDdlCqCzL4T6300fTyeRvVk")
 
 dotenv.config();
-mongoose.set("strictQuery", false);
+mongoose.set("strictQuery", false)
 mongoose
     .connect(process.env.MONGODB_URI)
     .then(() =>
