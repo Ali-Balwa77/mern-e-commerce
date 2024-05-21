@@ -52,7 +52,6 @@ const OrderHistoryScreen = () => {
     fetchData();
   }, [userInfo]);
 
-  console.log(orders)
   return (
     <div>
       <Helmet>

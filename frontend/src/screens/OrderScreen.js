@@ -115,7 +115,7 @@ const OrderScreen = () => {
         });
         if(stripePayload.paymentIntent.status === "succeeded"){
           const { data } = await axios.put(
-            `/api/orders/${order._id}/pay`,
+            `/api/orders/${order._id}/stripePay`,
             stripePayload,
             {
               headers: { authorization: `Bearer ${userInfo.token}` },
